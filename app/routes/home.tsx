@@ -9,10 +9,6 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
-type LoaderData = {
-  data: Code[];
-};
-
 export async function clientLoader() {
   const { data, error } = await supabase
     .from("code")
