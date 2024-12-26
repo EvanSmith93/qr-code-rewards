@@ -4,6 +4,7 @@ import { useLoaderData } from "react-router";
 import { Button, List, Typography } from "antd";
 import { useState } from "react";
 import type { Code } from "~/models";
+import { DeleteOutlined, QrcodeOutlined } from "@ant-design/icons";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
@@ -52,6 +53,16 @@ export default function Home() {
     }
   }
 
+  async function deleteCode(id: number) {
+    const { error } = await supabase.from("code").delete().match({ id });
+
+    if (error) {
+      console.error("Error deleting code:", error);
+    } else {
+      setCodes((prevData) => prevData.filter((item) => item.id !== id));
+    }
+  }
+
   return (
     <div className="p-4">
       <List
@@ -68,6 +79,14 @@ export default function Home() {
               }
               description={`${item.views} Views`}
             />
+            <div className="space-x-2">
+              <Button icon={<QrcodeOutlined />} href={`/detail/${item.id}`} />
+              <Button
+                icon={<DeleteOutlined />}
+                danger
+                onClick={() => deleteCode(item.id)}
+              />
+            </div>
           </List.Item>
         )}
       />
