@@ -1,6 +1,5 @@
 import type { Route } from "./+types/home";
 import {
-  redirect,
   useFetcher,
   useLoaderData,
   type ActionFunctionArgs,
@@ -9,57 +8,20 @@ import {
 import { Button, List, Typography } from "antd";
 import type { Code } from "~/models";
 import { DeleteOutlined, QrcodeOutlined } from "@ant-design/icons";
-import {
-  createServerClient,
-  parseCookieHeader,
-  serializeCookieHeader,
-} from "@supabase/ssr";
+import { middleware } from "~/utils/middleware";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
-export async function middleware(request: Request) {
-  const headers = new Headers();
-
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return parseCookieHeader(request.headers.get("Cookie") ?? "");
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            headers.append(
-              "Set-Cookie",
-              serializeCookieHeader(name, value, options)
-            )
-          );
-        },
-      },
-    }
-  );
-
-  const { data, error } = await supabase.auth.getSession();
-  const path = new URL(request.url).pathname;
-
-  if (path === "/login" && data.session) {
-    throw redirect("/");
-  } else if (path !== "/login" && !data.session) {
-    throw redirect("/login");
-  }
-
-  return { supabase, headers };
-}
-
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = await middleware(request);
+  const user = (await supabase.auth.getUser()).data.user!;
 
   const { data, error } = await supabase
     .from("code")
     .select("*")
+    .eq("user_id", user.id)
     .order("created_at");
 
   if (error) {
@@ -90,7 +52,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         .select();
 
       if (error) {
-        throw new Error(`Failed to create code: ${error.message}`);
+        throw new Error(`Failed to create code.`);
       }
 
       return new Response(JSON.stringify({ data }), {
@@ -106,7 +68,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
         .match({ id });
 
       if (error) {
-        throw new Error(`Failed to update code: ${error.message}`);
+        throw new Error(`Failed to update code.`);
       }
 
       return {};
@@ -117,7 +79,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
       const { error } = await supabase.from("code").delete().match({ id });
 
       if (error) {
-        throw new Error(`Failed to delete code: ${error.message}`);
+        throw new Error(`Failed to delete code.`);
       }
 
       return {};

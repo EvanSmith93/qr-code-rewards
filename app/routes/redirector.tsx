@@ -1,15 +1,15 @@
 import type { Route } from "./+types/home";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import type { Code } from "~/models";
-import { middleware } from "./home";
 import { useEffect } from "react";
+import { middleware } from "~/utils/middleware";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = await middleware(request);
+  const { supabase } = await middleware(request, false);
 
   const { data, error } = await supabase
     .from("code")

@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { eventStream } from "remix-utils/sse/server";
-import { middleware } from "~/routes/home";
+import { middleware } from "~/utils/middleware";
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = await middleware(request);

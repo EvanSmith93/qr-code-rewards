@@ -6,7 +6,7 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router";
-import { middleware } from "./home";
+import { middleware } from "~/utils/middleware";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase } = await middleware(request);

@@ -3,9 +3,9 @@ import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Progress, QRCode } from "antd";
 import type { Code } from "~/models";
 import { useState } from "react";
-import { middleware } from "./home";
 import { useLocation } from "react-router";
 import { useEventSource } from "remix-utils/sse/react";
+import { middleware } from "~/utils/middleware";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
@@ -13,11 +13,13 @@ export function meta({}: Route.MetaArgs) {
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
   const { supabase } = await middleware(request);
+  const user = (await supabase.auth.getUser()).data.user!;
 
   const { data, error } = await supabase
     .from("code")
     .select("*")
-    .eq("id", params.id);
+    .eq("id", params.id)
+    .eq("user_id", user.id);
 
   if (error) {
     console.error("Error fetching data:", error);
