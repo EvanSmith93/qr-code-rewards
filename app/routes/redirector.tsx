@@ -1,13 +1,16 @@
-import { supabase } from "~/supabaseClient";
 import type { Route } from "./+types/home";
-import { useLoaderData } from "react-router";
+import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import type { Code } from "~/models";
+import { middleware } from "./home";
+import { useEffect } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
-export async function clientLoader({ params }: { params: { id: string } }) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase } = await middleware(request);
+
   const { data, error } = await supabase
     .from("code")
     .select("*")
@@ -28,5 +31,8 @@ export async function clientLoader({ params }: { params: { id: string } }) {
 
 export default function Detail() {
   const initialData = useLoaderData() as { data: Code };
-  window.location.href = initialData.data.url;
+
+  useEffect(() => {
+    window.location.href = initialData.data.url;
+  }, []);
 }

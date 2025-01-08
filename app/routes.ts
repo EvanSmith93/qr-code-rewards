@@ -5,4 +5,5 @@ export default [
   route("detail/:id", "routes/detail.tsx"),
   route("/redirect/:id", "routes/redirector.tsx"),
   route("/login", "routes/login.tsx"),
+  route("/realtime/:id", "routes/realtime.$id.ts"),
 ] satisfies RouteConfig;

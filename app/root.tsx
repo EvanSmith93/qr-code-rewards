@@ -10,7 +10,6 @@ import {
 import type { Route } from "./+types/root";
 import stylesheet from "./styles/app.css?url";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { AuthRedirect } from "./components/authRedirect";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -51,9 +50,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <AuthRedirect>
-        <Outlet />
-      </AuthRedirect>
+      <Outlet />
     </GoogleOAuthProvider>
   );
 }

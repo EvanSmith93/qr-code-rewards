@@ -1,15 +1,19 @@
-import { supabase } from "~/supabaseClient";
 import type { Route } from "./+types/home";
-import { useLoaderData } from "react-router";
+import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Progress, QRCode } from "antd";
 import type { Code } from "~/models";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { middleware } from "./home";
+import { useLocation } from "react-router";
+import { useEventSource } from "remix-utils/sse/react";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
-export async function clientLoader({ params }: { params: { id: string } }) {
+export async function loader({ request, params }: LoaderFunctionArgs) {
+  const { supabase } = await middleware(request);
+
   const { data, error } = await supabase
     .from("code")
     .select("*")
@@ -26,28 +30,14 @@ export async function clientLoader({ params }: { params: { id: string } }) {
 export default function Detail() {
   const initialData = useLoaderData() as { data: Code };
   const [code, setCode] = useState<Code>(initialData.data);
-  const baseUrl = window.location.origin;
+  const location = useLocation();
+  const baseUrl = "http://localhost:5173";
   const url = `${baseUrl}/redirect/${initialData.data.id}`;
 
-  useEffect(() => {
-    const channel = supabase
-      .channel(`code_${initialData.data.id}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "code",
-          filter: `id=eq.${initialData.data.id}`,
-        },
-        (payload) => setCode(payload.new as Code)
-      )
-      .subscribe();
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, []);
+  const realtimeCount = useEventSource(`/realtime/${initialData.data.id}`, {
+    event: "countUpdate",
+  });
+  const count = realtimeCount ? Number(realtimeCount) : code.views;
 
   return (
     <div className="p-4 flex flex-col items-center space-y-4">
@@ -55,8 +45,8 @@ export default function Detail() {
       {url}
       <Progress
         className="w-1/2"
-        percent={(code.views / code.goal) * 100}
-        format={() => `${code.views} / ${code.goal}`}
+        percent={(count / code.goal) * 100}
+        format={() => `${count} / ${code.goal}`}
       />
     </div>
   );
