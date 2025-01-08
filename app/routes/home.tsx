@@ -113,7 +113,8 @@ export default function Home() {
   }
 
   return (
-    <div className="p-4">
+    <div className="p-4 w-1/3 mx-auto">
+      <Typography.Title level={2}>Your Codes</Typography.Title>
       <List
         dataSource={data}
         renderItem={(item) => (
