@@ -7,7 +7,7 @@ import { Button, List, Typography } from "antd";
 import { useState } from "react";
 import type { Code, CodeUpdate } from "~/models";
 import CodeModal from "./CodeModal";
-import { useFetcher } from "react-router";
+import { useFetcher, useNavigate } from "react-router";
 import { Actions } from "~/routes/home";
 
 type Props = {
@@ -17,6 +17,7 @@ type Props = {
 export default function CodeItem({ item }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
   const fetcher = useFetcher();
+  const navigate = useNavigate();
 
   function updateCode(code: CodeUpdate) {
     fetcher.submit(
@@ -44,7 +45,10 @@ export default function CodeItem({ item }: Props) {
             onClick={() => setModalOpen(true)}
             icon={<EditOutlined />}
           ></Button>
-          <Button icon={<QrcodeOutlined />} href={`/detail/${item.id}`} />
+          <Button
+            icon={<QrcodeOutlined />}
+            onClick={() => navigate(`/detail/${item.id}`)}
+          />
           <Button
             icon={<DeleteOutlined />}
             danger

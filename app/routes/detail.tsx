@@ -5,7 +5,7 @@ import type { Code } from "~/models";
 import { useEffect, useState } from "react";
 import { useEventSource } from "remix-utils/sse/react";
 import { middleware } from "~/utils/middleware";
-import JSConfetti from "js-confetti";
+import { useReward } from "react-rewards";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
@@ -34,26 +34,30 @@ export default function Detail() {
   const [code, setCode] = useState<Code>(initialData.data);
   const [baseUrl, setBaseUrl] = useState<string | null>(null);
   const url = `${baseUrl}/redirect/${initialData.data.id}`;
-  // const jsConfetti = new JSConfetti();
-
-  useEffect(() => {
-    setBaseUrl(window.location.origin);
-  }, []);
+  const { reward } = useReward("goalConfetti", "confetti", {
+    spread: 100,
+    elementCount: 150,
+  });
 
   const realtimeCount = useEventSource(`/realtime/${initialData.data.id}`, {
     event: "countUpdate",
   });
   const count = realtimeCount ? Number(realtimeCount) : code.views;
 
-  // useEffect(() => {
-  //   if (count === code.goal) {
-  //     jsConfetti.addConfetti();
-  //   }
-  // }, [count, code.goal]);
+  useEffect(() => {
+    setBaseUrl(window.location.origin);
+  }, []);
+
+  useEffect(() => {
+    if (count === code.goal) {
+      reward();
+    }
+  }, [count, code.goal]);
 
   return (
-    <div className="p-4 flex flex-col items-center space-y-4">
-      <QRCode value={url} />
+    <div className="h-screen flex flex-col justify-center items-center space-y-4">
+      <QRCode value={url} size={250} />
+      <span id="goalConfetti" />
       {url}
       <Progress
         className="w-1/2"
