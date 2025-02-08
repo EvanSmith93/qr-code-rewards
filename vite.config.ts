@@ -11,4 +11,9 @@ export default defineConfig({
     },
   },
   plugins: [reactRouter(), tsconfigPaths()],
+  optimizeDeps: {
+    esbuildOptions: {
+      resolveExtensions: [".mjs", ".js", ".ts", ".jsx", ".tsx"],
+    },
+  },
 });

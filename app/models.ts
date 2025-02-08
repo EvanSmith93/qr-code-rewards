@@ -5,3 +5,5 @@ export type Code = {
   views: number;
   goal: number;
 };
+
+export type CodeUpdate = Pick<Code, "url" | "goal"> & { id?: number };

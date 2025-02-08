@@ -33,6 +33,6 @@ export default function Detail() {
   const initialData = useLoaderData() as { data: Code };
 
   useEffect(() => {
-    window.location.href = initialData.data.url;
+    window.location.href = `https://${initialData.data.url}`;
   }, []);
 }

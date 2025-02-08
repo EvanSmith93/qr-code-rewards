@@ -6,9 +6,11 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import { Button, List, Typography } from "antd";
-import type { Code } from "~/models";
-import { DeleteOutlined, QrcodeOutlined } from "@ant-design/icons";
+import type { Code, CodeUpdate } from "~/models";
 import { middleware } from "~/utils/middleware";
+import CodeItem from "~/components/CodeItem";
+import CodeModal from "~/components/CodeModal";
+import { useState } from "react";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
@@ -34,21 +36,22 @@ export async function loader({ request }: LoaderFunctionArgs) {
   });
 }
 
-enum Actions {
+export enum Actions {
   CREATE_CODE = "CREATE_CODE",
-  UPDATE_URL = "UPDATE_URL",
+  UPDATE_CODE = "UPDATE_CODE",
   DELETE_CODE = "DELETE_CODE",
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const { supabase, headers } = await middleware(request);
-  const data = await request.json();
+  const reqData = await request.json();
 
-  switch (data.action) {
+  switch (reqData.action) {
     case Actions.CREATE_CODE: {
+      const { code } = reqData;
       const { data, error } = await supabase
         .from("code")
-        .insert([{ url: "" }])
+        .insert([{ ...code }])
         .select();
 
       if (error) {
@@ -60,12 +63,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
       });
     }
 
-    case Actions.UPDATE_URL: {
-      const { id, url } = data;
+    case Actions.UPDATE_CODE: {
+      const { code } = reqData;
       const { error } = await supabase
         .from("code")
-        .update({ url })
-        .match({ id });
+        .update({ ...code })
+        .match({ id: code.id });
 
       if (error) {
         throw new Error(`Failed to update code.`);
@@ -75,7 +78,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     case Actions.DELETE_CODE: {
-      const { id } = data;
+      const { id } = reqData;
       const { error } = await supabase.from("code").delete().match({ id });
 
       if (error) {
@@ -90,24 +93,11 @@ export async function action({ request, params }: ActionFunctionArgs) {
 export default function Home() {
   const { data } = JSON.parse(useLoaderData()) as { data: Code[] };
   const fetcher = useFetcher();
+  const [modalOpen, setModalOpen] = useState(false);
 
-  async function createCode() {
+  function createCode(code: CodeUpdate) {
     fetcher.submit(
-      { action: Actions.CREATE_CODE },
-      { method: "post", encType: "application/json" }
-    );
-  }
-
-  async function updateUrl(id: number, url: string) {
-    fetcher.submit(
-      { action: Actions.UPDATE_URL, id, url },
-      { method: "post", encType: "application/json" }
-    );
-  }
-
-  async function deleteCode(id: number) {
-    fetcher.submit(
-      { action: Actions.DELETE_CODE, id },
+      { action: Actions.CREATE_CODE, code },
       { method: "post", encType: "application/json" }
     );
   }
@@ -115,34 +105,15 @@ export default function Home() {
   return (
     <div className="p-4 w-1/3 mx-auto">
       <Typography.Title level={2}>Your Codes</Typography.Title>
-      <List
-        dataSource={data}
-        renderItem={(item) => (
-          <List.Item>
-            <List.Item.Meta
-              title={
-                <Typography.Text
-                  editable={{ onChange: (value) => updateUrl(item.id, value) }}
-                >
-                  {item.url}
-                </Typography.Text>
-              }
-              description={`${item.views} Views`}
-            />
-            <div className="space-x-2">
-              <Button icon={<QrcodeOutlined />} href={`/detail/${item.id}`} />
-              <Button
-                icon={<DeleteOutlined />}
-                danger
-                onClick={() => deleteCode(item.id)}
-              />
-            </div>
-          </List.Item>
-        )}
-      />
-      <Button type="dashed" onClick={createCode}>
+      <List dataSource={data} renderItem={(item) => <CodeItem item={item} />} />
+      <Button type="dashed" onClick={() => setModalOpen(true)}>
         Create New Code
       </Button>
+      <CodeModal
+        open={modalOpen}
+        onOk={createCode}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }

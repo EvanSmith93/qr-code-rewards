@@ -2,10 +2,10 @@ import type { Route } from "./+types/home";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
 import { Progress, QRCode } from "antd";
 import type { Code } from "~/models";
-import { useState } from "react";
-import { useLocation } from "react-router";
+import { useEffect, useState } from "react";
 import { useEventSource } from "remix-utils/sse/react";
 import { middleware } from "~/utils/middleware";
+import JSConfetti from "js-confetti";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
@@ -32,14 +32,24 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
 export default function Detail() {
   const initialData = useLoaderData() as { data: Code };
   const [code, setCode] = useState<Code>(initialData.data);
-  const location = useLocation();
-  const baseUrl = "http://localhost:5173";
+  const [baseUrl, setBaseUrl] = useState<string | null>(null);
   const url = `${baseUrl}/redirect/${initialData.data.id}`;
+  // const jsConfetti = new JSConfetti();
+
+  useEffect(() => {
+    setBaseUrl(window.location.origin);
+  }, []);
 
   const realtimeCount = useEventSource(`/realtime/${initialData.data.id}`, {
     event: "countUpdate",
   });
   const count = realtimeCount ? Number(realtimeCount) : code.views;
+
+  // useEffect(() => {
+  //   if (count === code.goal) {
+  //     jsConfetti.addConfetti();
+  //   }
+  // }, [count, code.goal]);
 
   return (
     <div className="p-4 flex flex-col items-center space-y-4">
