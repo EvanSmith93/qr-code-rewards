@@ -13,8 +13,14 @@ export default function CodeModal({ item, open, onOk, onClose }: Props) {
   const [form] = Form.useForm();
 
   const onFinish = (values: CodeUpdate) => {
-    console.log({ id: item?.id, ...values });
-    onOk({ id: item?.id, ...values });
+    const { title, url, goal } = values;
+    onOk({
+      id: item?.id,
+      title: title || undefined,
+      url,
+      goal,
+    });
+
     onClose();
   };
 
@@ -23,7 +29,16 @@ export default function CodeModal({ item, open, onOk, onClose }: Props) {
 
   return (
     <Modal open={open} title={title} onCancel={onClose} onOk={form.submit}>
-      <Form form={form} onFinish={onFinish} initialValues={initialValues}>
+      <Form
+        labelCol={{ span: 4 }}
+        wrapperCol={{ span: 20 }}
+        form={form}
+        onFinish={onFinish}
+        initialValues={initialValues}
+      >
+        <Form.Item label="Title" name="title">
+          <Input />
+        </Form.Item>
         <Form.Item
           label="URL"
           name="url"

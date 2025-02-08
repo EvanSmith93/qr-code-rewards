@@ -37,7 +37,12 @@ export default function CodeItem({ item }: Props) {
     <>
       <List.Item>
         <List.Item.Meta
-          title={<Typography.Text>https://{item.url}</Typography.Text>}
+          title={
+            <>
+              <Typography.Title level={5}>{item.title}</Typography.Title>
+              <Typography.Text>https://{item.url}</Typography.Text>
+            </>
+          }
           description={`${item.views} / ${item.goal} Views`}
         />
         <div className="space-x-2">

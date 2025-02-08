@@ -1,6 +1,6 @@
 import type { Route } from "./+types/home";
 import { useLoaderData, type LoaderFunctionArgs } from "react-router";
-import { Progress, QRCode } from "antd";
+import { Progress, QRCode, Typography } from "antd";
 import type { Code } from "~/models";
 import { useEffect, useState } from "react";
 import { useEventSource } from "remix-utils/sse/react";
@@ -56,6 +56,9 @@ export default function Detail() {
 
   return (
     <div className="h-screen flex flex-col justify-center items-center space-y-4">
+      {code.title && (
+        <Typography.Title level={2}>{code.title}</Typography.Title>
+      )}
       <QRCode value={url} size={250} />
       <span id="goalConfetti" />
       {url}
@@ -63,6 +66,7 @@ export default function Detail() {
         className="w-1/2"
         percent={(count / code.goal) * 100}
         format={() => `${count} / ${code.goal}`}
+        size={{ height: 18 }}
       />
     </div>
   );

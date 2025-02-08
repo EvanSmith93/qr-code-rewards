@@ -48,10 +48,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
 
   switch (reqData.action) {
     case Actions.CREATE_CODE: {
-      const { code } = reqData;
       const { data, error } = await supabase
         .from("code")
-        .insert([{ ...code }])
+        .insert([reqData.code])
         .select();
 
       if (error) {
@@ -64,11 +63,10 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
 
     case Actions.UPDATE_CODE: {
-      const { code } = reqData;
       const { error } = await supabase
         .from("code")
-        .update({ ...code })
-        .match({ id: code.id });
+        .update(reqData.code)
+        .match({ id: reqData.code.id });
 
       if (error) {
         throw new Error(`Failed to update code.`);
