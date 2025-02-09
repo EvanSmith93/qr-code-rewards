@@ -17,8 +17,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { supabase, headers } = await middleware(request);
-  const user = (await supabase.auth.getUser()).data.user!;
+  // const { supabase, headers } = await middleware(request);
+  // const user = (await supabase.auth.getUser()).data.user!;
 
   // const { data, error } = await supabase
   //   .from("code")
@@ -29,15 +29,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
     { id: 1, title: "Test", url: "hello.world", goal: 100, views: 0 },
   ];
 
-  const error = null;
-  if (error) {
-    console.error("Error fetching data:", error);
-    throw new Error("Failed to fetch data from Supabase.");
-  }
+  // const error = null;
+  // if (error) {
+  //   console.error("Error fetching data:", error);
+  //   throw new Error("Failed to fetch data from Supabase.");
+  // }
 
-  return new Response(JSON.stringify({ data }), {
-    headers,
-  });
+  return new Response(JSON.stringify({ data }), {});
 }
 
 export enum Actions {

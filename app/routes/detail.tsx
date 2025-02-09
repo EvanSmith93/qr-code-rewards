@@ -12,8 +12,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export async function loader({ request, params }: LoaderFunctionArgs) {
-  const { supabase } = await middleware(request);
-  const user = (await supabase.auth.getUser()).data.user!;
+  // const { supabase } = await middleware(request);
+  // const user = (await supabase.auth.getUser()).data.user!;
 
   // const { data, error } = await supabase
   //   .from("code")
@@ -24,11 +24,11 @@ export async function loader({ request, params }: LoaderFunctionArgs) {
     { id: 1, title: "Test", url: "hello.world", goal: 100, views: 0 },
   ];
 
-  const error = null;
-  if (error) {
-    console.error("Error fetching data:", error);
-    throw new Error("Failed to fetch data from Supabase.");
-  }
+  // const error = null;
+  // if (error) {
+  //   console.error("Error fetching data:", error);
+  //   throw new Error("Failed to fetch data from Supabase.");
+  // }
 
   return { data: data[0] };
 }
