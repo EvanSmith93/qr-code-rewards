@@ -6,11 +6,9 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-
 import type { Route } from "./+types/root";
 import stylesheet from "./styles/app.css?url";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import "antd/dist/reset.css";
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
