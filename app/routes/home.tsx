@@ -16,6 +16,8 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
+export const config = { runtime: "edge" };
+
 export async function loader({ request }: LoaderFunctionArgs) {
   // const { supabase, headers } = await middleware(request);
   // const user = (await supabase.auth.getUser()).data.user!;
@@ -91,7 +93,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
 }
 
 export default function Home() {
-  const { data } = JSON.parse(useLoaderData()) as { data: Code[] };
+  const { data } = useLoaderData() as { data: Code[] };
   const fetcher = useFetcher();
   const [modalOpen, setModalOpen] = useState(false);
 

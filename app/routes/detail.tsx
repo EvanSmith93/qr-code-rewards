@@ -11,6 +11,8 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "QR Code Rewards" }];
 }
 
+export const config = { runtime: "edge" };
+
 export async function loader({ request, params }: LoaderFunctionArgs) {
   // const { supabase } = await middleware(request);
   // const user = (await supabase.auth.getUser()).data.user!;
