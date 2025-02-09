@@ -20,12 +20,16 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { supabase, headers } = await middleware(request);
   const user = (await supabase.auth.getUser()).data.user!;
 
-  const { data, error } = await supabase
-    .from("code")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at");
+  // const { data, error } = await supabase
+  //   .from("code")
+  //   .select("*")
+  //   .eq("user_id", user.id)
+  //   .order("created_at");
+  const data = [
+    { id: 1, title: "Test", url: "hello.world", goal: 100, views: 0 },
+  ];
 
+  const error = null;
   if (error) {
     console.error("Error fetching data:", error);
     throw new Error("Failed to fetch data from Supabase.");
